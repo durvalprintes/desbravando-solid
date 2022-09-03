@@ -14,10 +14,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import cotuba.application.ParametrosCotuba;
 import lombok.Getter;
 
 @Getter
-class LeitorOpcoesCli {
+class LeitorOpcoesCli implements ParametrosCotuba {
 
   private Path diretorioDosMD;
   private String formato;

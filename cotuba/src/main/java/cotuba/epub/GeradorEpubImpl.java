@@ -3,13 +3,17 @@ package cotuba.epub;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import org.springframework.stereotype.Component;
+
+import cotuba.application.GeradorEpub;
 import cotuba.domain.Ebook;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
 
-public class GeradorEpub {
+@Component
+public class GeradorEpubImpl implements GeradorEpub {
 
   public void gera(Ebook ebook) {
 
@@ -27,8 +31,5 @@ public class GeradorEpub {
             ex);
       }
     });
-
-    // TODO: usar título do capítulo
-
   }
 }

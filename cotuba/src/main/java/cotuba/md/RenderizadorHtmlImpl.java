@@ -14,10 +14,13 @@ import org.commonmark.node.Node;
 import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.springframework.stereotype.Component;
 
+import cotuba.application.RenderizadorHtml;
 import cotuba.domain.Capitulo;
 
-public class RenderizadorHtml {
+@Component
+public class RenderizadorHtmlImpl implements RenderizadorHtml {
 
   public List<Capitulo> renderiza(Path diretorioDosMD) {
 
