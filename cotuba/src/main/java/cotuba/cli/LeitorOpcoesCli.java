@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -15,13 +16,14 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import cotuba.application.ParametrosCotuba;
+import cotuba.domain.FormatoEbook;
 import lombok.Getter;
 
 @Getter
 class LeitorOpcoesCli implements ParametrosCotuba {
 
   private Path diretorioDosMD;
-  private String formato;
+  private FormatoEbook formato;
   private Path arquivoDeSaida;
   private boolean modoVerboso = false;
 
@@ -85,9 +87,9 @@ class LeitorOpcoesCli implements ParametrosCotuba {
     String nomeDoFormatoDoEbook = cmd.getOptionValue("format");
 
     if (nomeDoFormatoDoEbook != null) {
-      formato = nomeDoFormatoDoEbook.toLowerCase();
+      formato = FormatoEbook.valueOf(nomeDoFormatoDoEbook.toUpperCase());
     } else {
-      formato = "pdf";
+      formato = FormatoEbook.PDF;
     }
   }
 
@@ -96,18 +98,22 @@ class LeitorOpcoesCli implements ParametrosCotuba {
     if (nomeDoArquivoDeSaidaDoEbook != null) {
       arquivoDeSaida = Paths.get(nomeDoArquivoDeSaidaDoEbook);
     } else {
-      arquivoDeSaida = Paths.get("book." + formato.toLowerCase());
+      arquivoDeSaida = Paths.get("book." + formato.name().toLowerCase());
     }
-    try {
-      if (Files.isDirectory(arquivoDeSaida)) {
-        // deleta arquivos do diretório recursivamente
-        Files.walk(arquivoDeSaida).sorted(Comparator.reverseOrder())
+    if (Files.isDirectory(arquivoDeSaida)) {
+      try (Stream<Path> files = Files.walk(arquivoDeSaida)) {
+        files
+            .sorted(Comparator.reverseOrder())
             .map(Path::toFile).forEach(File::delete);
-      } else {
-        Files.deleteIfExists(arquivoDeSaida);
+      } catch (IOException e) {
+        throw new IllegalArgumentException(e);
       }
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
+    } else {
+      try {
+        Files.deleteIfExists(arquivoDeSaida);
+      } catch (IOException e) {
+        throw new IllegalArgumentException(e);
+      }
     }
   }
 

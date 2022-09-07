@@ -10,7 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Ebook {
 
-  private String formato;
+  private FormatoEbook formato;
   private Path arquivoDeSaida;
   private List<Capitulo> capitulos;
 

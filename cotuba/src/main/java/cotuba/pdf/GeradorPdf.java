@@ -15,12 +15,19 @@ import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.property.AreaBreakType;
 
-import cotuba.application.GeradorPdf;
+import cotuba.application.GeradorEbook;
 import cotuba.domain.Ebook;
+import cotuba.domain.FormatoEbook;
 
 @Component
-public class GeradorPdfImpl implements GeradorPdf {
+public class GeradorPdf implements GeradorEbook {
 
+  @Override
+  public boolean accept(FormatoEbook formato) {
+    return FormatoEbook.PDF.equals(formato);
+  }
+
+  @Override
   public void gera(Ebook ebook) {
     try (var writer = new PdfWriter(Files.newOutputStream(ebook.getArquivoDeSaida()));
         var pdf = new PdfDocument(writer);

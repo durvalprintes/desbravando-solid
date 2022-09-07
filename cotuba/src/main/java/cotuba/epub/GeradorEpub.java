@@ -5,16 +5,23 @@ import java.nio.file.Files;
 
 import org.springframework.stereotype.Component;
 
-import cotuba.application.GeradorEpub;
+import cotuba.application.GeradorEbook;
 import cotuba.domain.Ebook;
+import cotuba.domain.FormatoEbook;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
 
 @Component
-public class GeradorEpubImpl implements GeradorEpub {
+public class GeradorEpub implements GeradorEbook {
 
+  @Override
+  public boolean accept(FormatoEbook formato) {
+    return FormatoEbook.EPUB.equals(formato);
+  }
+
+  @Override
   public void gera(Ebook ebook) {
 
     var epub = new Book();

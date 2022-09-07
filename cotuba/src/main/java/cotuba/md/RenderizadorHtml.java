@@ -16,22 +16,21 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.springframework.stereotype.Component;
 
-import cotuba.application.RenderizadorHtml;
 import cotuba.domain.Capitulo;
 
 @Component
-public class RenderizadorHtmlImpl implements RenderizadorHtml {
+public class RenderizadorHtml {
 
   public List<Capitulo> renderiza(Path diretorioDosMD) {
-
     PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
+
     try (Stream<Path> arquivosMD = Files.list(diretorioDosMD)) {
       return arquivosMD
           .filter(matcher::matches)
           .sorted()
           .map(arquivoMD -> {
             Capitulo capitulo = new Capitulo();
-            capitulo.setConteudoHtml(convertHtml(arquivoMD, parseMd(arquivoMD, capitulo)));
+            capitulo.setConteudoHtml(HtmlRenderer.builder().build().render((parseMd(arquivoMD, capitulo))));
             return capitulo;
           }).toList();
     } catch (IOException ex) {
@@ -42,8 +41,8 @@ public class RenderizadorHtmlImpl implements RenderizadorHtml {
 
   private Node parseMd(Path arquivoMD, Capitulo capitulo) {
     try {
-      Parser parser = Parser.builder().build();
-      var document = parser.parseReader(Files.newBufferedReader(arquivoMD));
+      var document = Parser.builder().build().parseReader(Files.newBufferedReader(arquivoMD));
+      
       document.accept(new AbstractVisitor() {
         @Override
         public void visit(Heading heading) {
@@ -55,17 +54,8 @@ public class RenderizadorHtmlImpl implements RenderizadorHtml {
         }
       });
       return document;
-    } catch (Exception ex) {
-      throw new IllegalStateException("Erro ao fazer parse do arquivo " + arquivoMD, ex);
-    }
-  }
-
-  private String convertHtml(Path arquivoMD, Node document) {
-    try {
-      HtmlRenderer renderer = HtmlRenderer.builder().build();
-      return renderer.render(document);
-    } catch (Exception ex) {
-      throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + arquivoMD, ex);
+    } catch (IOException ex) {
+      throw new IllegalStateException("Erro ao renderizar arquivo " + arquivoMD, ex);
     }
   }
 
